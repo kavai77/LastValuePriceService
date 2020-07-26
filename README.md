@@ -1,4 +1,5 @@
 # Last Value Price Service
+[![Build Status](https://travis-ci.org/kavai77/LastValuePriceService.svg?branch=master)](https://travis-ci.org/kavai77/LastValuePriceService)
 
 ## Prerequisites
 * Maven
