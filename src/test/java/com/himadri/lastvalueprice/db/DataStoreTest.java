@@ -72,8 +72,8 @@ class DataStoreTest {
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         for (int i = 0; i < 1000; i++) {
             executorService.submit(() -> {
-                long asOfAndPrice = counter.getAndIncrement();
-                dataStore.updatePrices(List.of(new PriceData(TEST_ID, asOfAndPrice, () -> new BigDecimal(asOfAndPrice))));
+                long timeAndPrice = counter.getAndIncrement();
+                dataStore.updatePrices(List.of(new PriceData(TEST_ID, timeAndPrice, () -> new BigDecimal(timeAndPrice))));
             });
         }
         executorService.shutdown();

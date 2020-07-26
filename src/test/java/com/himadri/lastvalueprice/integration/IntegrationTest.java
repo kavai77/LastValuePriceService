@@ -51,7 +51,7 @@ public class IntegrationTest {
 
     /**
      * This test updates the prices with multiple producers and multiple batches concurrently.
-     * By the end the atomic counter should hold the final value
+     * By the end, the atomic counter should hold the final value for assertions
      */
     @Test
     public void loadTestUpdates() throws Exception {
@@ -71,23 +71,23 @@ public class IntegrationTest {
             executorService.submit(() -> {
                 BatchId batchId = producerAPI.startBatch();
 
-                CountDownLatch batcCountDown = new CountDownLatch(batchCount);
+                CountDownLatch batchCountDown = new CountDownLatch(batchCount);
                 for (int j = 0; j < batchCount; j++) {
                     executorService.submit(() -> {
                         List<PriceData> priceData = new ArrayList<>();
                         for (IdAndCounter idAndCounter: idsAndCounters) {
                             if (random.nextInt() % 4 == 0) { // 25% chance that we send an update
-                                long idAsOfAndPrice = idAndCounter.getCounter().getAndIncrement();
-                                priceData.add(new PriceData(idAndCounter.getId(), idAsOfAndPrice, () -> new BigDecimal(idAsOfAndPrice)));
+                                long timeAndPrice = idAndCounter.getCounter().getAndIncrement();
+                                priceData.add(new PriceData(idAndCounter.getId(), timeAndPrice, () -> new BigDecimal(timeAndPrice)));
                             }
                         }
                         producerAPI.uploadBatch(batchId, priceData);
-                        batcCountDown.countDown();
+                        batchCountDown.countDown();
                     });
                 }
                 executorService.submit(() -> {
                     try {
-                        batcCountDown.await();
+                        batchCountDown.await();
                         producerAPI.commitBatch(batchId);
                     } catch (InterruptedException ignored) {}
                 });
