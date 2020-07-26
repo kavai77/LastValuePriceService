@@ -51,7 +51,7 @@ public class ProducerAPIImpl implements ProducerAPI {
     }
 
     @Override
-    public void commitBatch(BatchId batchId) {
+    public void commitBatch(BatchId batchId) throws InterruptedException {
         List<PriceData> priceData;
         synchronized (batchId) {
             priceData = batchStorage.remove(batchId);

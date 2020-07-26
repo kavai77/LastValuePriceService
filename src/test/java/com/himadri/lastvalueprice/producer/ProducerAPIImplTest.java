@@ -27,7 +27,7 @@ class ProducerAPIImplTest {
     }
 
     @Test
-    public void testUploadMultipleBatches() {
+    public void testUploadMultipleBatches() throws Exception {
         BatchId batchId = producer.startBatch();
         PriceData priceData1 = new PriceData("1", 1, () -> new BigDecimal(1));
         PriceData priceData2 = new PriceData("2", 2, () -> new BigDecimal(2));
@@ -49,7 +49,7 @@ class ProducerAPIImplTest {
     }
 
     @Test
-    public void testOperationsAfterCommit() {
+    public void testOperationsAfterCommit() throws Exception {
         BatchId batchId = producer.startBatch();
         PriceData priceData1 = new PriceData("1", 1, () -> new BigDecimal(1));
 

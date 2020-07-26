@@ -7,7 +7,7 @@ public interface ProducerAPI {
 
     void uploadBatch(BatchId batchId, List<PriceData> priceDataStream);
 
-    void commitBatch(BatchId batchId);
+    void commitBatch(BatchId batchId) throws InterruptedException;
 
     void cancelBatch(BatchId batchId);
 }

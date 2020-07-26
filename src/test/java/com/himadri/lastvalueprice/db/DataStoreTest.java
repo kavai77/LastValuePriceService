@@ -73,7 +73,9 @@ class DataStoreTest {
         for (int i = 0; i < 1000; i++) {
             executorService.submit(() -> {
                 long timeAndPrice = counter.getAndIncrement();
-                dataStore.updatePrices(List.of(new PriceData(TEST_ID, timeAndPrice, () -> new BigDecimal(timeAndPrice))));
+                try {
+                    dataStore.updatePrices(List.of(new PriceData(TEST_ID, timeAndPrice, () -> new BigDecimal(timeAndPrice))));
+                } catch (InterruptedException ignored) {}
             });
         }
         executorService.shutdown();

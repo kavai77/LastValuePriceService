@@ -22,9 +22,9 @@ public class DataStore {
         return latestPriceStore.get().get(id);
     }
 
-    public void updatePrices(List<PriceData> priceDataList) {
+    public void updatePrices(List<PriceData> priceDataList) throws InterruptedException {
         // only one concurrent batch update is allowed: we optimize for reads over writes
-        updatePriceSemaphore.acquireUninterruptibly();
+        updatePriceSemaphore.acquire();
         try {
             // we prepare the new prices by copying the existing ones
             Map<String, PriceRecord> newPrices = new HashMap<>(latestPriceStore.get());

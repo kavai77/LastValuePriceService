@@ -36,7 +36,7 @@ public class IntegrationTest {
     private ConsumerAPI consumerAPI;
 
     @Test
-    void testNormalLifeCycle() {
+    void testNormalLifeCycle() throws Exception {
         BatchId batchId = producerAPI.startBatch();
         String id = "id";
         producerAPI.uploadBatch(batchId, List.of(new PriceData(id, 1, () -> new BigDecimal(1))));
@@ -55,7 +55,8 @@ public class IntegrationTest {
      */
     @Test
     public void loadTestUpdates() throws Exception {
-        Random random = new Random();
+        final long randomSeed = System.currentTimeMillis();
+        final Random random = new Random(randomSeed);
 
         final int concurrentProducerCount = 100;
         final int batchCount = 50;
@@ -76,7 +77,10 @@ public class IntegrationTest {
                     executorService.submit(() -> {
                         List<PriceData> priceData = new ArrayList<>();
                         for (IdAndCounter idAndCounter: idsAndCounters) {
-                            if (random.nextInt() % 4 == 0) { // 25% chance that we send an update
+                            // randomizing batches to better test real-life scenarios
+                            // this test should never be flaky and if it does, it indicates a serious race condition and must not be ignored
+                            // use the seed printed in the assertion failures to have a better chance reproducing a flacky test
+                            if (random.nextInt() % 4 == 0) {
                                 long timeAndPrice = idAndCounter.getCounter().getAndIncrement();
                                 priceData.add(new PriceData(idAndCounter.getId(), timeAndPrice, () -> new BigDecimal(timeAndPrice)));
                             }
@@ -99,7 +103,7 @@ public class IntegrationTest {
         executorService.awaitTermination(10, TimeUnit.SECONDS);
         for (IdAndCounter idAndCounter: idsAndCounters) {
             BigDecimal expectedLatestPrice = new BigDecimal(idAndCounter.getCounter().get() - 1);
-            assertEquals(expectedLatestPrice, consumerAPI.getLatestPrice(idAndCounter.getId()));
+            assertEquals(expectedLatestPrice, consumerAPI.getLatestPrice(idAndCounter.getId()), "To reproduce this test failure, user the random with this seed: " + randomSeed);
         }
     }
 
